@@ -1,36 +1,39 @@
-import hashlib, hmac, time
+import hashlib
+import hmac
+import time
 import requests
 
-class bittrex(object):
+
+class Bittrex(object):
     
-    def __init__(self, apiKey, apiSecret, apiVersion='v3'):
+    def __init__(self, api_key, api_secret, api_version='v3'):
         self.apiVersion = 'v3'
         self.baseUrl = 'https://api.bittrex.com'
-        self.apiKey = apiKey
-        self.apiSecret = apiSecret
+        self.apiKey = api_key
+        self.apiSecret = api_secret
 
-    def _getHeaders(self, fullUrl, content, method):
+    def _getheaders(self, fullurl, content, method):
         apiContentHash = hashlib.sha512(bytearray(content,'utf-8')).hexdigest()
-        apiTimestamp = round(time.time()*1000)
-        preSignList = apiTimestamp, fullUrl, method.upper(), apiContentHash
+        apiTimestamp = str(round(time.time()*1000))
+        preSignList = apiTimestamp, fullurl, method.upper(), apiContentHash
         preSign = ''.join(preSignList)
-        apiSignature = hmac.new(self.apiSecret, bytearray(preSign, 'utf-8'), hashlib.sha512).hexdigest()
+        apiSignature = hmac.new(bytearray(self.apiSecret, 'utf-8'), bytearray(preSign, 'utf-8'), hashlib.sha512).hexdigest()
         headers = {
-            'API-Key' : self.apiKey,
-            'API-Timestamp' : apiTimestamp,
-            'API-Content-Hash' : apiContentHash,
-            'API-Signature' : apiSignature
+            'API-Key': self.apiKey,
+            'API-Timestamp': apiTimestamp,
+            'API-Content-Hash': apiContentHash,
+            'API-Signature': apiSignature
         }
         return headers
 
-    def _apiCall(self, route, content='', method='GET'):
-        fullUrl = self.baseUrl + '/' + self.apiVersion + '/' + route
-        headers = self._getHeaders(fullUrl, content, method)
-        response = getattr(requests, method)(fullUrl, headers=headers, data=content)
+    def _apicall(self, route, content='', method='GET'):
+        full_url = self.baseUrl + '/' + self.apiVersion + '/' + route
+        headers = self._getheaders(full_url, content, method)
+        response = getattr(requests, method.lower())(full_url, headers=headers, data=content)
         return response
 
     def balances(self):
-        r = self._apiCall('balances')
+        r = self._apicall('balances')
         return r
         
         
