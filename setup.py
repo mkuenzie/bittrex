@@ -1,5 +1,6 @@
 from setuptools import setup
 
+
 setup(name='bittrex',
       version='0.1',
       description='Python wrapper for the Bittrex API',

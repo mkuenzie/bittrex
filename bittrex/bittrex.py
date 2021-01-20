@@ -7,10 +7,10 @@ from enum import Enum
 
 
 class CandleInterval(Enum):
-    MINUTE_1 = '1m'
-    MINUTE_5 = '1m'
-    HOUR_1 = '1h'
-    DAY_1 = '1d'
+    MINUTE_1 = timedelta(minute=1)
+    MINUTE_5 = timedelta(minute=5)
+    HOUR_1 = timedelta(hour=1)
+    DAY_1 = timedelta(day=1)
 
 
 def _decode_json_bytes(json_bytes):
@@ -106,7 +106,8 @@ class Bittrex(object):
         r = self._api(endpoint)
         return _decode_json_bytes(r)
 
-    def markets_candle(self, market_symbol, interval=CandleInterval('1m')):
+    def markets_candle(self, market_symbol, interval=timedelta(minutes=1)):
+        interval = CandleInterval(interval)
         endpoint = 'markets/' + market_symbol + '/candles/' + interval.name + '/recent'
         return self._cache(endpoint)
 
