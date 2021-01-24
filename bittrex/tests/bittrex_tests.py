@@ -10,5 +10,11 @@ def connect():
 my_bittrex = connect()
 
 
-btc_candles = my_bittrex.markets_candle('BTC-USD')
-print(btc_candles)
+ticker = my_bittrex.markets_ticker('BTC-USD')
+last_trade = float(ticker['lastTradeRate'])
+budget = 50
+quantity = round(budget / last_trade, 8)
+
+buy_order = my_bittrex.buy(market_symbol='BTC-USD', quantity=quantity)
+print(buy_order)
+#sell_order = my_bittrex.sell('BTC-USD')
