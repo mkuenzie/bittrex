@@ -61,17 +61,18 @@ class Bittrex(object):
             cached_value = self.cache[endpoint]
             if cached_value.sequence_num >= sequence_num:
                 return cached_value.value
-        else:
-            r = self._api(endpoint)
-            sequence_num = int(r.headers['Sequence'])
-            value = _decode_json_bytes(r)
-            self.cache[endpoint] = CachedResponse(sequence_num, value)
-            return value
+        r = self._api(endpoint)
+        sequence_num = int(r.headers['Sequence'])
+        value = _decode_json_bytes(r)
+        self.cache[endpoint] = CachedResponse(sequence_num, value)
+        return value
 
     def _api(self, route, content='', method='GET', auth_required=False, success_status=200):
         full_url = self.baseUrl + '/' + self.apiVersion + '/' + route
         if auth_required:
             headers = self._getheaders(full_url, content, method)
+            if content != '':
+                headers['Content-Type'] = 'application/json'
             response = getattr(requests, method.lower())(full_url, headers=headers, data=content)
         else:
             response = getattr(requests, method.lower())(full_url, data=content)
@@ -150,7 +151,7 @@ class Bittrex(object):
         if order_type not in valid_order_types:
             raise ValueError(order_type + "is not a valid value for order_type")
         if order_type == 'MARKET':
-            content = {'marketSymbol': market_symbol, 'direction': 'BUY', 'type': 'MARKET', 'quantity': quantity,
+            content = {'marketSymbol': market_symbol, 'direction': 'SELL', 'type': 'MARKET', 'quantity': quantity,
                        'timeInForce': time_in_force}
         r = self._api('orders', json.dumps(content), method='POST', auth_required=True, success_status=201)
         return _decode_json_bytes(r)
