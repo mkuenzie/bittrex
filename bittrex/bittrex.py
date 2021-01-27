@@ -82,6 +82,11 @@ class Bittrex(object):
         else:
             raise Exception("You haven't implemented error handling!")
 
+    def ping(self):
+        endpoint = 'ping'
+        r = self._api(endpoint)
+        return _decode_json_bytes(r)
+
     def balances(self, currency_symbol=''):
         if currency_symbol != '':
             endpoint = 'balances/' + currency_symbol
