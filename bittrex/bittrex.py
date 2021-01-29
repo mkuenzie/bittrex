@@ -4,7 +4,7 @@ import time
 import requests
 import json
 from enum import Enum
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 
 class CandleInterval(Enum):
@@ -80,8 +80,9 @@ class Bittrex(object):
         if response.status_code == success_status:
             return response
         elif response.status_code == 429:
-            print("Too many API requests, waiting 1 minute to retry...")
-            time.sleep(60)
+            print("Too many API requests, waiting until next minute to retry...")
+            n = 60 - datetime.now().time().second
+            time.sleep(n)
             return self._api(route, content, method, auth_required, success_status)
         else:
             raise Exception("You haven't implemented error handling!")
