@@ -79,6 +79,10 @@ class Bittrex(object):
 
         if response.status_code == success_status:
             return response
+        elif response.status_code == 429:
+            print("Too many API requests, waiting 1 minute to retry...")
+            time.sleep(60)
+            return self._api(route, content, method, auth_required, success_status)
         else:
             raise Exception("You haven't implemented error handling!")
 
