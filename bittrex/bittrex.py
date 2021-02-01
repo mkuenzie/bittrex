@@ -60,12 +60,18 @@ class Bittrex(object):
         if endpoint in self.cache:
             cached_value = self.cache[endpoint]
             if cached_value.sequence_num >= sequence_num:
-                return cached_value.value
+                return {
+                    'sequence': cached_value.sequence_num,
+                    'data': cached_value.value
+                }
         r = self._api(endpoint)
         sequence_num = int(r.headers['Sequence'])
         value = _decode_json_bytes(r)
         self.cache[endpoint] = CachedResponse(sequence_num, value)
-        return value
+        return {
+            'sequence': sequence_num,
+            'data': value
+        }
 
     def _api(self, route, content='', method='GET', auth_required=False, success_status=200):
         full_url = self.baseUrl + '/' + self.apiVersion + '/' + route
@@ -81,10 +87,13 @@ class Bittrex(object):
             return response
         elif response.status_code == 429:
             print("Too many API requests, waiting until next minute to retry...")
-            n = 60 - datetime.now().time().second
-            time.sleep(n)
+            time.sleep(60)
             return self._api(route, content, method, auth_required, success_status)
         else:
+            print(response.status_code)
+            print(response.content)
+            print(content)
+            print(route)
             raise Exception("You haven't implemented error handling!")
 
     def ping(self):
