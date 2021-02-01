@@ -133,6 +133,13 @@ class Bittrex(object):
         r = self._api(endpoint)
         return _decode_json_bytes(r)
 
+    def markets_candle_history(self, market_symbol, date, interval=timedelta(minutes=1)):
+        interval = CandleInterval(interval)
+        endpoint = 'markets/' + market_symbol + '/candles/' + interval.name + '/historical' + \
+                   '/' + date.strftime('%Y/%m/%d')
+        r = self._api(endpoint)
+        return _decode_json_bytes(r)
+
     def markets_candle(self, market_symbol, interval=timedelta(minutes=1)):
         interval = CandleInterval(interval)
         endpoint = 'markets/' + market_symbol + '/candles/' + interval.name + '/recent'
